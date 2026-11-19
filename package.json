@@ -1,0 +1,25 @@
+{
+  "name": "autoqa",
+  "version": "1.0.0",
+  "description": "Quality analysis tester",
+  "homepage": "https://github.com/abhishek-7081/AutoQA#readme",
+  "bugs": {
+    "url": "https://github.com/abhishek-7081/AutoQA/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhishek-7081/AutoQA.git"
+  },
+  "license": "ISC",
+  "author": "Abhishek Tripathi",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "openai": "^7.57.0",
+    "tiktoken": "^1.0.22"
+  }
+}
