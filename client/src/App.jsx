@@ -34,7 +34,7 @@ export default function App() {
   const [videoUrl, setVideoUrl] = useState(null);
   const [scriptText, setScriptText] = useState('');
   const [scriptFile, setScriptFile] = useState(null);
-  const [model, setModel] = useState('gemini-2.5-flash');
+  const [model, setModel] = useState('gemini-3.5-flash');
   const [strictness, setStrictness] = useState('balanced');
 
   // Video Player state

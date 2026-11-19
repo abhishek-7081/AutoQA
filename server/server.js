@@ -3,7 +3,12 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config();
+const envPath = path.join(__dirname, '../.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+} else {
+  require('dotenv').config();
+}
 
 const { analyzeVideoWithScript } = require('./analyzer');
 const { extractScriptText } = require('./scriptParser');
@@ -194,9 +199,43 @@ if (fs.existsSync(distPath)) {
 
 // Start server if directly executed
 if (require.main === module) {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`AutoQA Backend Server listening on http://localhost:${PORT}`);
-  });
+  function startServerWithFallback(portToTry) {
+    const server = app.listen(portToTry, '0.0.0.0', () => {
+      console.log(`\n==================================================`);
+      console.log(` AutoQA Server is READY and LISTENING!`);
+      console.log(` Local URL: http://localhost:${portToTry}`);
+      console.log(` Network URL: http://127.0.0.1:${portToTry}`);
+      console.log(`==================================================\n`);
+    });
+
+    server.on('error', (err) => {
+      if ((err.code === 'EACCES' || err.code === 'EADDRINUSE') && portToTry !== 5001) {
+        console.warn(`Port ${portToTry} encountered ${err.code}. Automatically falling back to port 5001...`);
+        startServerWithFallback(5001);
+      } else if ((err.code === 'EACCES' || err.code === 'EADDRINUSE') && portToTry === 5001) {
+        console.warn(`Port 5001 encountered ${err.code}. Automatically falling back to port 8080...`);
+        startServerWithFallback(8080);
+      } else {
+        console.error('Server listen error:', err);
+      }
+    });
+
+    // Ensure process stays active indefinitely
+    const keepAlive = setInterval(() => {}, 60000);
+
+    process.on('SIGINT', () => {
+      clearInterval(keepAlive);
+      server.close(() => process.exit(0));
+    });
+
+    process.on('SIGTERM', () => {
+      clearInterval(keepAlive);
+      server.close(() => process.exit(0));
+    });
+  }
+
+  const initialPort = parseInt(PORT, 10) || 5001;
+  startServerWithFallback(initialPort);
 }
 
 module.exports = app;

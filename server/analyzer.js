@@ -20,7 +20,7 @@ async function analyzeVideoWithScript({
   videoOriginalName = 'video.mp4',
   scriptText,
   apiKey,
-  model = 'gemini-2.5-flash',
+  model = 'gemini-3.5-flash',
   strictness = 'balanced',
   onProgress = () => {},
 }) {
@@ -190,29 +190,60 @@ Output your complete evaluation ONLY as a valid JSON object matching the followi
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: model || 'gemini-2.5-flash',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              fileData: {
-                fileUri: fileInfo.uri,
-                mimeType: fileInfo.mimeType,
+    let targetModel = model || 'gemini-3.5-flash';
+    if (targetModel.includes('2.5-flash')) targetModel = 'gemini-3.5-flash';
+
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: targetModel,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                fileData: {
+                  fileUri: fileInfo.uri,
+                  mimeType: fileInfo.mimeType,
+                },
               },
-            },
-            {
-              text: prompt,
-            },
-          ],
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.2,
         },
-      ],
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.2, // Low temperature for high precision and factual grounding
-      },
-    });
+      });
+    } catch (modelErr) {
+      console.warn(`Primary model ${targetModel} encountered error, trying fallback gemini-3.5-flash...`, modelErr.message);
+      response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                fileData: {
+                  fileUri: fileInfo.uri,
+                  mimeType: fileInfo.mimeType,
+                },
+              },
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.2,
+        },
+      });
+    }
 
     onProgress({ step: 'finalizing', message: 'Parsing analysis results and formatting report...' });
 

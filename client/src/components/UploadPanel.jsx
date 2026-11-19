@@ -243,10 +243,10 @@ export default function UploadPanel({
             onChange={(e) => setModel(e.target.value)}
             className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 outline-none focus:border-blue-500 transition"
           >
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended: Fast, High Accuracy Multimodal)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Standard Multimodal)</option>
-            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Visual Reasoning)</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Recommended: Ultra Fast, High Accuracy)</option>
+            <option value="gemini-3.8-flash">Gemini 3.8 Flash (High Capacity Reasoning)</option>
+            <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deep Visual Analysis)</option>
           </select>
         </div>
 
